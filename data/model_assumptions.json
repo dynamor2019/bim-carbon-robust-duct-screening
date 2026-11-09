@@ -1,0 +1,109 @@
+{
+  "model_assumptions": {
+    "schema_version": 1,
+    "source_sha256": "fac6e3a2e47e4f0c9114444c62ae10cdef9f342b9780c42f89438720c8741c9c",
+    "source_roles": [
+      "component_geometry",
+      "design_sections",
+      "terminal_design_demands",
+      "source_design_pressure_records"
+    ],
+    "topology_origin": "ASSUMED_RADIAL_MODEL_FROM_REAL_IFC_SAME_SYSTEM_BBOX_CONTACTS_NOT_NATIVE_PORTS",
+    "root_rule": "Highest source design-flow duct segment, tie lowest IFC id; an assumed ideal pressure boundary, not identified 302PF01 or misassigned 307TK device.",
+    "service_rule": "All 158 source-group terminals are assumed to require their full source design demand simultaneously. No rescaling to the unrelated or unverified 3.6 m3/s fan schedule.",
+    "contact_tolerances_m": [
+      0.005,
+      0.01,
+      0.02
+    ],
+    "design_demand_multipliers": [
+      0.8,
+      1.0,
+      1.2
+    ],
+    "held_out_demand_multipliers": [
+      0.9,
+      1.1,
+      1.3,
+      1.4
+    ],
+    "held_out_grid_factors": [
+      0.05,
+      0.2,
+      0.4
+    ],
+    "route_modes": [
+      "hop",
+      "length",
+      "resistance"
+    ],
+    "sizing_modes": [
+      "source",
+      "velocity",
+      "larger"
+    ],
+    "parameters": {
+      "density_kg_m3": 1.2,
+      "kinematic_viscosity_m2_s": 1.5e-05,
+      "roughness_m": 9e-05,
+      "efficiency": 0.6,
+      "hours_per_year": 2500,
+      "grid_kgco2e_kwh": 0.2,
+      "wall_thickness_m": 0.0007,
+      "steel_density_kg_m3": 7850,
+      "velocity_limit_m_s": 7,
+      "envelope_expansion_ratio": 1.5,
+      "horizon_years": 20,
+      "duct_lifetime_years": 30,
+      "duct_production_kgco2e_kg": 2.8,
+      "diameter_catalogue_m": [
+        0.1,
+        0.125,
+        0.16,
+        0.2,
+        0.25,
+        0.315,
+        0.4,
+        0.5,
+        0.63,
+        0.8,
+        1.0,
+        1.25
+      ],
+      "missing_local_loss_coefficients": {
+        "IfcDuctFitting": 1.0,
+        "IfcDamper": 2.0,
+        "IfcDuctSilencer": 2.0,
+        "IfcAirTerminal": 2.0
+      }
+    },
+    "parameter_origin": "ALL_PARAMETERS_IN_PARAMETERS_ARE_ASSUMED_EXPERIENCE_BASED_VALUES_NOT_INSTALLED_PRODUCT_OR_MEASURED_DATA",
+    "generation_rule": "Declare engineering-like nominal constants, finite counterfactual diameter options, demand stress levels and carbon-factor scenarios before the conditional calculation. Do not change them after seeing favorable or infeasible outcomes.",
+    "pressure_boundary": "Ideal controllable pressure source meeting the model critical-path loss with constant assumed efficiency and ideal balancing. No actual fan curve, stable operating point or 302PF01 capability is inferred.",
+    "local_loss_rule": "Positive source design pressure and flow records calibrate quadratic flow scaling; missing records use disclosed component-class coefficients. Coefficients do not represent product qualification. Counterfactual section changes also require a velocity-squared scaling assumption.",
+    "sizing_boundary": "Circular counterfactual diameter rules within an assumed 1.5-times source-diameter envelope; source rectangular shape stays unchanged. Envelope is not a certified clash-free domain.",
+    "carbon_boundary": "Duct shell A1-A3 and declared duct replacement production only, plus ideal-source electricity B6. Fan manufacture, fittings, insulation, supports, installation, other replacements and end-of-life are excluded. No full-system LCA or field savings claim.",
+    "replacement_requirements": [
+      "Native service/port topology and real source boundary",
+      "Applicable fan/control curves and operating schedule",
+      "Diameter-specific wall gauges and installation envelopes",
+      "Product EPD and region/year grid factors",
+      "Fitting and terminal pressure characteristics"
+    ],
+    "claim_limits": [
+      "Conditional real-source model, not field validation",
+      "Finite graph-derived path trees, not continuous-route optimality",
+      "Paired design variants of one source project, not independent buildings",
+      "All negative, disconnected, unsupported-regime and no-selection cases must remain visible"
+    ]
+  },
+  "terminal_count": 158,
+  "source_terminal_total_m3_s": 3.8149999999999933,
+  "assumed_pressure_root_ifc_id": 3307429,
+  "field_validation": false,
+  "selections": {
+    "deterministic": "t0.01_hop_larger",
+    "minimax": "t0.02_resistance_larger",
+    "minimax_regret": "t0.02_resistance_larger"
+  }
+}
