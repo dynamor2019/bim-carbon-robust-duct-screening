@@ -24,11 +24,9 @@ Duct routes in this study are taken from an IFC model, not drawn by hand for the
 
 Chen et al. (2022) route ducts on a graph and test six floor plans, with pressure balance, obstacles, resistance and material cost in the stated objective. Calixto et al. (2026) generate coordinated layouts in MiniZinc under spatial, flow and clearance constraints. Both treat terminal demand as known. Roberts et al. (2025) show that MEP carbon is often omitted from building totals. They do not rescore duct sections when demand is scaled. The comparison below uses one extracted network and 27 candidates. It counts how many still pass a 7 m/s screen after demand is scaled, and it records the carbon difference between the nominal pick and the pick that must pass every design demand.
 
-### Present study: BIM-driven automated screening
+### The exhaust subsystem
 
 The case is the 302PK01 exhaust subsystem in the Nordic BIM4LCA office model: 158 terminals, 3.815 m³/s nominal. Contact gaps of 0.005, 0.01 and 0.02 m, three path weights and three sizing rules give 27 candidates. Design demands are 0.8, 1.0 and 1.2 times nominal. Held-out cells use demands of 0.9, 1.1, 1.3 and 1.4 with grid intensities of 0.05, 0.2 and 0.4 kgCO₂e/kWh. A cell passes only if no visited segment is in transitional flow and every non-terminal velocity is at most 7 m/s. Passing cells report duct-shell production (A1–A3) and ideal-fan electricity (B6) over 20 years.
-
-Of 405 cells, 128 pass, 241 fail the velocity screen and 36 remain unresolved. The lowest carbon among the 16 candidates that pass at nominal demand is t0.01_hop_larger, at 26,388 kgCO₂e. It passes 3 of 12 held-out cells. The four candidates that pass all three design demands use the larger sizing rule (4/9; the other two rules are 0/9 at 1.2× demand). Nominal, minimax and minimax-regret selection inside that set return t0.02_resistance_larger, at 26,941 kgCO₂e. The difference is 552 kgCO₂e (2.09%). That candidate passes all 12 held-out cells. The two selected candidates also differ in contact gap and path rule. The ledger keeps the failures. It does not certify a fan, a fitting or a field schedule.
 
 ### Scope and limitations
 
@@ -68,15 +66,11 @@ The executed comparison is nominal, minimax and minimax-regret selection on a fi
 
 ### Source data and topology inference
 
-Geometric properties, design section dimensions, and terminal service demands for the 302PK01 exhaust subsystem were extracted from the Industry Foundation Classes (IFC) model authored by the professional design team within the Nordic BIM4LCA research package. The source dataset comprises 158 terminal devices with a combined nominal design demand of 3.815 m³/s, world coordinates, rectangular or circular section records for duct segments, and component class annotations for fittings, dampers, silencers, and terminals. Because the supplied extraction did not provide authenticated port-to-port connectivity for this system, radial contact relationships were inferred by proximity thresholds (0.005 m, 0.01 m, and 0.02 m) between component bounding boxes within the same declared system group.
-
-**Topology inference validation.**
-
-Geometric adjacency is inferred. Its physical accuracy has not been established by a traceable inspection record, and numerical screening is conditional on that inferred topology.
+Geometric properties, design section dimensions, and terminal service demands for the 302PK01 exhaust subsystem were extracted from the Industry Foundation Classes (IFC) model authored by the professional design team within the Nordic BIM4LCA research package. The source dataset comprises 158 terminal devices with a combined nominal design demand of 3.815 m³/s, world coordinates, rectangular or circular section records for duct segments, and component class annotations for fittings, dampers, silencers, and terminals. The extraction has no authenticated port-to-port links, so contact is a bounding-box gap of 0.005, 0.01 or 0.02 m inside the declared system. Nobody inspected those contacts on site. The screen is conditional on that guess.
 
 Five components lacked positive source dimension records in the archived extraction. Their interface sizes were read from the same office-concrete model and substituted: IFC 611084 is an 800 mm × 1400 mm rectangular tee, IFC 611151 is a 1400 mm × 800 mm rectangular cap, IFC 3680435 and 3680544 are Ø200 mm terminals, and IFC 3681026 is a Ø250 mm terminal. Rectangular sections are converted to hydraulic diameter by 4A/P. Re-evaluation left the 405-cell status counts—128 feasible, 241 velocity failures, and 36 unresolved transitional-flow cells—and both selected designs unchanged. Carbon values changed in 23 cells belonging only to the non-selected candidates t0.005_length_larger and t0.01_length_larger. This check compares the same conditional model with verified interface sizes; it is not field validation or engineering certification. The archived supplementary register still records the historical 0.16 m placeholders. For 155 other terminals, the hydraulic diameter remains the maximum mesh-face reference rather than the Revit duct-connection size: 133 faces of 160 mm against Ø125 connections, 12 of 180 mm against Ø160, and 10 of 195 mm against Ø160. Those references were not substituted, because the face and the connection are different geometric objects. One transition fitting retains an 800 mm geometric-port reference matching its circular port; its rectangular 800 mm × 1400 mm port is not represented by that single diameter. The highest-flow duct segment in the source design (IFC ID 3307429) was designated as an ideal controllable pressure boundary for conditional network calculations, not as a verified fan identity or certified device capacity. The catalogue heuristics likewise define this finite numerical comparison only.
 
-Model boundaries and parameter assumptions are collected under the heading of that name. Design-split performance and feasibility, Complete status accounting, and Held-out scenario evaluation report the original finite-candidate results. Substituting the five model interface sizes reproduced those status counts and both selected designs; 23 carbon values changed only in the non-selected candidates t0.005_length_larger and t0.01_length_larger. Sensitivity to parameter assumptions separately reports the input-perturbation experiment, including the historical 0.12–0.20 m stress of the former placeholders. IFC 611084 and 611151 remain absent from all original candidate paths.
+
 
 ### Hydraulic and carbon calculation model
 
@@ -86,15 +80,15 @@ Carbon accounting includes duct shell initial production (A1–A3) plus ideal-so
 
 ### Equations and executable mapping
 
-For a circular section, area and wetted perimeter are $A_i=\pi D_i^2/4$ and $P_i=\pi D_i$. For a source rectangular section, $A_i=w_i h_i$, $P_i=2(w_i+h_i)$ and $D_{h,i}=4A_i/P_i$. Source millimetres are converted to metres. The five previously missing sections use the model interface sizes: hydraulic diameters of the 800 mm × 1400 mm and 1400 mm × 800 mm rectangles, and circular diameters of 200 mm, 200 mm, and 250 mm. The area used in continuity and velocity remains the rectangular area for rectangular components, not the area of a circle with the same hydraulic diameter. These definitions map to prepare_dimensions in source_network_model.py.
+For a circular section, area and wetted perimeter are $A_i=\pi D_i^2/4$ and $P_i=\pi D_i$. For a source rectangular section, $A_i=w_i h_i$, $P_i=2(w_i+h_i)$ and $D_{h,i}=4A_i/P_i$. Source millimetres are converted to metres. The five previously missing sections use the model interface sizes: hydraulic diameters of the 800 mm × 1400 mm and 1400 mm × 800 mm rectangles, and circular diameters of 200 mm, 200 mm, and 250 mm. The area used in continuity and velocity remains the rectangular area for rectangular components, not the area of a circle with the same hydraulic diameter. 
 
-Radial-tree continuity and velocity follow flows and evaluate_tree:
+Continuity and velocity are
 
 $Q_i(s)=q_i(s)+\sum_{j\in children(i)}Q_j(s),\qquad v_i(s)=Q_i(s)/A_i.$
 
 Here $q_i$ is terminal demand, zero at other nodes; scenario demand multiplies source terminal loads. $Q$ is in cubic metres per second, $A$ in square metres and $v$ in metres per second. Each node has one parent; this is a prescribed-load radial calculation, not a fan-network operating-point or branch-balancing solve.
 
-Straight-segment loss maps to node_loss and pressure_loss in source_anchored_physics.py:
+Straight-segment loss is
 
 $Re_i=v_iD_{h,i}/\nu,\qquad \Delta p_i=f_i(L_i/D_{h,i})\rho_a v_i^2/2.$
 
@@ -104,11 +98,11 @@ $y+2\log_{10}\left(\epsilon/(3.7D_h)+2.51y/Re\right)=0.$
 
 For $2300\leq Re<4000$ no friction result is imputed. A transitional node yields an unresolved cell with null objective before the final velocity-screen check; an unresolved cell is therefore not proof that every other component passes velocity. $\nu$ is in square metres per second, $\epsilon,D_h,L$ in metres, $\rho_a$ in kilograms per cubic metre and losses in pascals.
 
-Local losses map to local_pressure: if positive source loss and source velocity exist,
+If a positive source loss and a source velocity exist,
 
 $\Delta p_i=\Delta p_{src,i}(v_i/v_{src,i})^2;$
 
-otherwise $\Delta p_i=K_{class}\rho_a v_i^2/2$ with disclosed class-level assumptions. Neither relation authenticates a counterfactual manufacturer's fitting. Critical-path pressure and ideal annual electricity map to evaluate_tree:
+otherwise $\Delta p_i=K_{class}\rho_a v_i^2/2$ with disclosed class-level assumptions. Neither relation is a manufacturer's fitting curve. Critical-path pressure and ideal annual electricity are
 
 $p_{req}(s)=\max_{t\in terminals}\sum_{i\in path(root,t)}\Delta p_i(s),\qquad E_{annual}(s)=Q_{root}(s)p_{req}(s)h_{annual}/(1000\eta).$
 
@@ -349,7 +343,7 @@ The authors declare that they have no known competing financial interests or per
 
 ### Data availability
 
-A local supplementary archive, conditional-case-support-v4.zip, accompanies this draft. It contains project-relative model code, source-derived interfaces and contacts, the assumption register, five historical 0.16 m placeholder inputs, the complete 405-cell ledger, 15 scenario-status rows, 27 candidate mappings, original and isolated replay outputs, numerical-audit report and software-test log. Both result files have SHA256 b626d640c9bed9cd45a51a77262e57097abf2906d79d90d756f6ab6cb3f73c01. The replay is byte-identical and the 15 software tests passed; these are software and numerical-accounting checks, not scientific or engineering certification. The code and the 405-cell scalar ledger are public at https://github.com/dynamor2019/paper04-duct-carbon-screening. There is no DOI. The full component-level result file is 146.7 MB, above GitHub's 100 MB file limit, so the public CSV omits per-component arrays; the SHA256 above identifies the complete local file. Redistribution rights for the original BIM/IFC source have not been confirmed, and the original IFC is not included. A later substitution of the five model interface sizes reproduced the archived 405-cell status counts and both selected designs; 23 carbon values changed only in non-selected length-based candidates. That check does not replace the archived hash and is not a new certified ledger. Operating hours, fan efficiency, roughness, wall thickness, grid and material factors, and the fitting-loss coefficient remain experience-based assumptions, not measured data. Public deposition, source permissions and any access commitments require author review before submission.
+A local supplementary archive, conditional-case-support-v4.zip, accompanies this draft. It contains project-relative model code, source-derived interfaces and contacts, the assumption register, five historical 0.16 m placeholder inputs, the complete 405-cell ledger, 15 scenario-status rows, 27 candidate mappings, original and isolated replay outputs, numerical-audit report and software-test log. Both result files have SHA256 b626d640c9bed9cd45a51a77262e57097abf2906d79d90d756f6ab6cb3f73c01. The replay is byte-identical and the 15 software tests passed; these are software and numerical-accounting checks, not scientific or engineering certification. The code and the 405-cell scalar ledger are public at https://github.com/dynamor2019/paper04-duct-carbon-screening. There is no DOI. The full component-level result file is 146.7 MB, above GitHub's 100 MB file limit, so the public CSV omits per-component arrays; the SHA256 above identifies the complete local file. Redistribution rights for the original BIM/IFC source have not been confirmed, and the original IFC is not included. A later substitution of the five model interface sizes reproduced the archived 405-cell status counts and both selected designs; 23 carbon values changed only in non-selected length-based candidates. That check does not replace the archived hash and is not a new certified ledger. Operating hours, fan efficiency, roughness, wall thickness, grid and material factors, and the fitting-loss coefficient remain experience-based assumptions, not measured data. The original IFC is still not public.
 
 The public repository contains the model code, the 405 scalar cell records, the 27 candidate geometries, and this manuscript. It does not contain the original IFC. Replaying the CSV does not replace lawful access to that IFC for an independent extraction check.
 
