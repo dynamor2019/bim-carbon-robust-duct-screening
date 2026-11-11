@@ -1,4 +1,4 @@
-# BIM duct multi-scenario carbon screening
+# BIM-driven Automated Multi-scenario Screening for Carbon-robust Duct Network Design
 
 Public code and derived results for the manuscript *BIM-driven Automated Multi-scenario Screening for Carbon-robust Duct Network Design* (Zhang Min and Li Xiaoliang).
 
